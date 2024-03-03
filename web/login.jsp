@@ -20,6 +20,13 @@
     </div>
     <%
         }
+        else if (request.getParameter("errorRole") != null) {
+            %>
+    <div class="alert alert-danger ms-5 me-5" role="alert">
+        You are not admin!
+    </div>
+    <%
+        }
     %>
     <div class="card ms-5 me-5">
         <h5 class="card-header">

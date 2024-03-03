@@ -12,7 +12,7 @@
   </head>
   <style>
       .navbar-brand-gap {
-      margin-right: 600px;}
+      margin-right: 750px;}
   </style>
   <body>
   <div class="container">
@@ -35,14 +35,19 @@
                       </li>
                       <%
                       }%>
+                      <%
+                          if (user1 == null){
+                      %>
                       <li class="nav-item">
                           <a class="nav-link active" aria-current="page" href="/register">Register</a>
                       </li>
                       <li class="nav-item">
-                          <a class="nav-link active" aria-current="page" href="#">By Category</a>
-                      </li>
-                      <li class="nav-item">
                           <a class="nav-link active" aria-current="page" href="/login">Sign in</a>
+                      </li>
+                      <%
+                          }%>
+                      <li class="nav-item">
+                          <a class="nav-link active" aria-current="page" href="#">By Category</a>
                       </li>
                       <%
                           if (user1 != null){

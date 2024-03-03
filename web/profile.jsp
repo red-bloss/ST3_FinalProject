@@ -6,7 +6,7 @@
 <body>
 <%@include file="/vendor/navbar.jsp" %>
 <div class="container mt-3">
-    <div class="card ms-5 me-5">
+    <div class="card ms-5 me-5 mb-3">
         <h5 class="card-header">
             Profile Page
         </h5>

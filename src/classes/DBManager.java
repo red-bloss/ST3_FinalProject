@@ -128,10 +128,111 @@ public class DBManager {
             PreparedStatement stmt = connection.prepareStatement("INSERT INTO news (post_date, category_id, title, content) " +
                     "VALUES (Now(), ?, ?, ?)");
             stmt.setLong(1, news.getCategory().getId());
+            stmt.setString(2, news.getTitle());
+            stmt.setString(3, news.getContent());
+            rows = stmt.executeUpdate();
+            stmt.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         return rows>0;
+    }
+
+    public static News getNews(Long id){
+        News news = null;
+        try {
+            PreparedStatement stmt = connection.prepareStatement("SELECT n.id, n.post_date, n.title, n.content, c.id, c.name FROM news AS n " +
+                    "INNER JOIN news_categories c on n.category_id = c.id WHERE n.id = ?");
+            stmt.setLong(1, id);
+            ResultSet resultSet = stmt.executeQuery();
+            if (resultSet.next()){
+                news = new News();
+                news.setId(resultSet.getLong("id"));
+                news.setTitle(resultSet.getString("title"));
+                news.setContent(resultSet.getString("content"));
+                news.setPostDate(resultSet.getTimestamp("post_date"));
+                Category c = new Category();
+                c.setId(resultSet.getLong("id"));
+                c.setName(resultSet.getString("name"));
+                news.setCategory(c);
+            }
+            stmt.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return news;
+    }
+
+    public static boolean updateNews(News news){
+        int rows = 0;
+        try {
+            PreparedStatement stmt = connection.prepareStatement("UPDATE news SET title=?, content =?, category_id=? " +
+                    "WHERE id = ?");
+            stmt.setString(1, news.getTitle());
+            stmt.setString(2, news.getContent());
+            stmt.setLong(3, news.getCategory().getId());
+            stmt.setLong(4, news.getId());
+
+            rows = stmt.executeUpdate();
+            stmt.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return rows>0;
+    }
+
+    public static void deleteNews(Long id){
+        try {
+            PreparedStatement stmt = connection.prepareStatement("DELETE FROM news WHERE id = ?");
+            stmt.setLong(1, id);
+            stmt.execute();
+            stmt.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static boolean addComment(Comment comment){
+        int row = 0;
+        try {
+            PreparedStatement stmt = connection.prepareStatement("INSERT INTO comments (comment, post_date, user_id, news_id ) " +
+                    "VALUES (?, Now(), ?, ?)");
+            stmt.setString(1, comment.getComment());
+            stmt.setLong(2, comment.getUser().getId());
+            stmt.setLong(3, comment.getNews().getId());
+            row = stmt.executeUpdate();
+            stmt.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return row>0;
+    }
+
+    public static List<Comment> getCommentsOfNews(Long id){
+        List<Comment> comments = new ArrayList<>();
+        try {
+            PreparedStatement statement = connection.prepareStatement("SELECT c.id, c.comment, c.post_date, u.id, u.email\n" +
+                    "FROM comments AS c\n" +
+                    "    INNER JOIN users u on u.id = c.user_id\n" +
+                    "                      WHERE c.news_id = ? ");
+            statement.setLong(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()){
+                Comment comment = new Comment();
+                comment.setId(resultSet.getLong("id"));
+                comment.setComment(resultSet.getString("comment"));
+                comment.setPostDate(resultSet.getTimestamp("post_date"));
+                User user = new User();
+                user.setId(resultSet.getLong("id"));
+                user.setEmail(resultSet.getString("email"));
+                comment.setUser(user);
+                comments.add(comment);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return comments;
     }
 
 }
